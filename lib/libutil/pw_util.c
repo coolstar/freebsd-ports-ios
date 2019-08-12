@@ -73,6 +73,16 @@ static char passwd_dir[PATH_MAX];
 static char tempname[PATH_MAX];
 static int initialized;
 
+#define MUL_NO_OVERFLOW ((size_t)1 << (sizeof(size_t) * 4))
+void *reallocarray(void *optr, size_t nmemb, size_t size) {
+    if ((nmemb >= MUL_NO_OVERFLOW || size >= MUL_NO_OVERFLOW) &&
+        nmemb > 0 && SIZE_MAX / nmemb < size) {
+        errno = ENOMEM;
+        return NULL;
+    }
+    return realloc(optr, size * nmemb);
+}
+
 #if 0
 void
 pw_cont(int sig)
@@ -95,7 +105,7 @@ pw_init(const char *dir, const char *master)
 #endif
 
 	if (dir == NULL) {
-		strcpy(passwd_dir, _PATH_ETC);
+		strcpy(passwd_dir, _PATH_PWD);
 	} else {
 		if (strlen(dir) >= sizeof(passwd_dir)) {
 			errno = ENAMETOOLONG;
@@ -341,8 +351,8 @@ pw_edit(int notsetuid)
 	sigprocmask(SIG_SETMASK, &oldsigset, NULL);
 	if (stat(tempname, &st2) == -1)
 		return (-1);
-	return (st1.st_mtim.tv_sec != st2.st_mtim.tv_sec ||
-	    st1.st_mtim.tv_nsec != st2.st_mtim.tv_nsec);
+	return (st1.st_mtimespec.tv_sec != st2.st_mtimespec.tv_sec ||
+	    st1.st_mtimespec.tv_nsec != st2.st_mtimespec.tv_nsec);
 }
 
 /*

@@ -92,23 +92,17 @@ __pw_scan(char *bp, struct passwd *pw, int flags)
 	if (pw_big_ids_warning == -1)
 		pw_big_ids_warning = getenv("PW_SCAN_BIG_IDS") == NULL ? 1 : 0;
 
-	pw->pw_fields = 0;
 	if (!(pw->pw_name = strsep(&bp, ":")))		/* login */
 		goto fmt;
 	root = !strcmp(pw->pw_name, "root");
-	if (pw->pw_name[0] && (pw->pw_name[0] != '+' || pw->pw_name[1] == '\0'))
-		pw->pw_fields |= _PWF_NAME;
 
 	if (!(pw->pw_passwd = strsep(&bp, ":")))	/* passwd */
 		goto fmt;
-	if (pw->pw_passwd[0])
-		pw->pw_fields |= _PWF_PASSWD;
 
 	if (!(p = strsep(&bp, ":")))			/* uid */
 		goto fmt;
-	if (p[0])
-		pw->pw_fields |= _PWF_UID;
-	else {
+    if (p[0]){
+    } else {
 		if (pw->pw_name[0] != '+' && pw->pw_name[0] != '-') {
 			if (flags & _PWSCAN_WARN)
 				warnx("no uid for user %s", pw->pw_name);
@@ -141,9 +135,8 @@ __pw_scan(char *bp, struct passwd *pw, int flags)
 
 	if (!(p = strsep(&bp, ":")))			/* gid */
 		goto fmt;
-	if (p[0])
-		pw->pw_fields |= _PWF_GID;
-	else {
+    if (p[0]){
+    } else {
 		if (pw->pw_name[0] != '+' && pw->pw_name[0] != '-') {
 			if (flags & _PWSCAN_WARN)
 				warnx("no gid for user %s", pw->pw_name);
@@ -172,30 +165,20 @@ __pw_scan(char *bp, struct passwd *pw, int flags)
 	if (flags & _PWSCAN_MASTER ) {
 		if (!(pw->pw_class = strsep(&bp, ":")))	/* class */
 			goto fmt;
-		if (pw->pw_class[0])
-			pw->pw_fields |= _PWF_CLASS;
 		
 		if (!(p = strsep(&bp, ":")))		/* change */
 			goto fmt;
-		if (p[0])
-			pw->pw_fields |= _PWF_CHANGE;
 		pw->pw_change = atol(p);
 		
 		if (!(p = strsep(&bp, ":")))		/* expire */
 			goto fmt;
-		if (p[0])
-			pw->pw_fields |= _PWF_EXPIRE;
 		pw->pw_expire = atol(p);
 	}
 	if (!(pw->pw_gecos = strsep(&bp, ":")))		/* gecos */
 		goto fmt;
-	if (pw->pw_gecos[0])
-		pw->pw_fields |= _PWF_GECOS;
 
 	if (!(pw->pw_dir = strsep(&bp, ":")))		/* directory */
 		goto fmt;
-	if (pw->pw_dir[0])
-		pw->pw_fields |= _PWF_DIR;
 
 	if (!(pw->pw_shell = strsep(&bp, ":")))		/* shell */
 		goto fmt;
@@ -213,8 +196,6 @@ __pw_scan(char *bp, struct passwd *pw, int flags)
 		}
 		endusershell();
 	}
-	if (p[0])
-		pw->pw_fields |= _PWF_SHELL;
 
 	if ((p = strsep(&bp, ":"))) {			/* too many */
 fmt:		

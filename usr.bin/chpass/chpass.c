@@ -237,51 +237,26 @@ main(int argc, char *argv[])
 		password = "";
 	}
 
-	if (old_pw != NULL)
-		pw->pw_fields |= (old_pw->pw_fields & _PWF_SOURCE);
-	switch (pw->pw_fields & _PWF_SOURCE) {
-#ifdef YP
-	case _PWF_NIS:
-		ypclnt = ypclnt_new(yp_domain, "passwd.byname", yp_host);
-		if (ypclnt == NULL) {
-			warnx("ypclnt_new failed");
-			exit(1);
-		}
-		if (ypclnt_connect(ypclnt) == -1 ||
-		    ypclnt_passwd(ypclnt, pw, password) == -1) {
-			warnx("%s", ypclnt->error);
-			ypclnt_free(ypclnt);
-			exit(1);
-		}
-		ypclnt_free(ypclnt);
-		errx(0, "NIS user information updated");
-#endif /* YP */
-	case 0:
-	case _PWF_FILES:
-		if (pw_init(NULL, NULL))
-			err(1, "pw_init()");
-		if ((pfd = pw_lock()) == -1) {
-			pw_fini();
-			err(1, "pw_lock()");
-		}
-		if ((tfd = pw_tmp(-1)) == -1) {
-			pw_fini();
-			err(1, "pw_tmp()");
-		}
-		if (pw_copy(pfd, tfd, pw, old_pw) == -1) {
-			pw_fini();
-			err(1, "pw_copy");
-		}
-		if (pw_mkdb(pw->pw_name) == -1) {
-			pw_fini();
-			err(1, "pw_mkdb()");
-		}
-		pw_fini();
-		errx(0, "user information updated");
-		break;
-	default:
-		errx(1, "unsupported passwd source");
-	}
+    if (pw_init(NULL, NULL))
+        err(1, "pw_init()");
+    if ((pfd = pw_lock()) == -1) {
+        pw_fini();
+        err(1, "pw_lock()");
+    }
+    if ((tfd = pw_tmp(-1)) == -1) {
+        pw_fini();
+        err(1, "pw_tmp()");
+    }
+    if (pw_copy(pfd, tfd, pw, old_pw) == -1) {
+        pw_fini();
+        err(1, "pw_copy");
+    }
+    if (pw_mkdb(pw->pw_name) == -1) {
+        pw_fini();
+        err(1, "pw_mkdb()");
+    }
+    pw_fini();
+    errx(0, "user information updated");
 }
 
 static void

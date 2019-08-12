@@ -43,32 +43,7 @@
 
 #include <sys/cdefs.h>
 #include <sys/_types.h>
-#include <sys/_stdint.h>
-
-#ifndef _GID_T_DECLARED
-typedef	__gid_t		gid_t;
-#define	_GID_T_DECLARED
-#endif
-
-#ifndef _MODE_T_DECLARED
-typedef	__mode_t	mode_t;
-#define	_MODE_T_DECLARED
-#endif
-
-#ifndef _PID_T_DECLARED
-typedef	__pid_t		pid_t;
-#define	_PID_T_DECLARED
-#endif
-
-#ifndef _SIZE_T_DECLARED
-typedef	__size_t	size_t;
-#define	_SIZE_T_DECLARED
-#endif
-
-#ifndef _UID_T_DECLARED
-typedef	__uid_t		uid_t;
-#define	_UID_T_DECLARED
-#endif
+#include <stdint.h>
 
 #define	PROPERTY_MAX_NAME	64
 #define	PROPERTY_MAX_VALUE	512
